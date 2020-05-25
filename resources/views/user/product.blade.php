@@ -1,4 +1,4 @@
-@extends('user.layouts.app')
+@extends('layouts.app')
 
 @section('content')
 @if (session('success'))
@@ -21,10 +21,18 @@
                               <h2>{{$product->name}}</h2>         
                           </div>
                           <div class="text-center">
-                            <h2>Price: {{number_format($product->price, 2, ',', ' ')}} zł</h2>         
+                            <h2>{{ __('Price') }}: {{number_format($product->price, 2, ',', ' ')}} zł</h2>         
                         </div>
                         <div class="text-center">
-                        <a href="/product/{{$product->id}}/edit" class="btn btn-md btn-primary">Add to carts</a>       
+                            <h2>{{ __('Stock') }}: {{$product->amount}}</h2>         
+                        </div>
+                        <div class="text-center">
+                            @if ($product->amount==0)
+                            <button class="btn btn-md btn-primary" disabled>{{ __('Add to carts') }}</button>  
+                            @else
+                            <a href="{{ route('product.edit', ['product'=> $product->id, 'lang' => app()->getLocale()]) }}" class="btn btn-md btn-primary" {{$product->amount<1 ? 'disabled' : ''}}>{{ __('Add to carts') }}</a>
+                            @endif
+                               
                         </div>
                          </p>
                     </div>

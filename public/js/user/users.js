@@ -1,20 +1,5 @@
-/*document.body.onload = () => {
-    //console.log('Loaded!');
-    let showFormBtn = document.getElementById("show-new-user-form");
-    let newUserForm = document.getElementById("new-user-form");
-    newUserForm.style.display = "none";
 
-    showFormBtn.onclick = () => {
-        console.log('Clicked');
-        if(newUserForm.style.display=="none"){
-            newUserForm.style.display="block"; 
-        }else{
-            newUserForm.style.display="none";
-        }
-    }
-}*/
 document.body.onload = () => {
-    $('#delete-product-modal').modal('hide');
     let deleteModal = document.getElementById("delete-product-modal");
     console.log('test');
 
@@ -40,11 +25,9 @@ document.body.onload = () => {
             return  $(this).text();
         }).get();
     
-        console.log(data);
+        //console.log(data);
 
         $('#delete_id').val(data[0]);
-        //$('#edit_id2').val(data[1]);
-        //$('#edit_id3').val(data[2]);
 
     });
 

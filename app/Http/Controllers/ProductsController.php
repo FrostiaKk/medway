@@ -18,19 +18,27 @@ class ProductsController extends Controller
         return view('user/index', ['products' => $products]);
     }
 
-    public function show(Product $product)
+    public function show( $ss,Product $product)
     {
-        return view('user/product', compact('product'));
+        //dd($product);
+        return view('user/product', ['product' => $product]);
     }
 
-    public function edit(Product $product)
+    public function edit($ss, Product $product)
     {
-        $basket= new \App\Basket;
-        $basket->user_id=Auth::user()->id;
-        $basket->product_id=$product['id'];
-        $basket->save();
+        $basket=\App\Basket::where('product_id', $product['id'])->where('user_id', Auth::user()->id)->first();
+        if($basket==null)
+        {
+            $basket= new \App\Basket;
+            $basket->user_id=Auth::user()->id;
+            $basket->product_id=$product['id'];
+            $basket->save();
+        }else{
+            $basket->quantity++;
+            $basket->save();
+        }
 
-        return redirect('/product/'.$product['id'])->with('success', 'Successfully Added To Carts ');
+        return redirect()->route('product', ['product'=> $product->id, 'lang' => app()->getLocale()])->with('success', __('Successfully Added To Carts'));
 
     }
 }

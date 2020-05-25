@@ -11,11 +11,11 @@
             <div class="row">
                 <div class="col-sm-11">
                     <div class="card">
-                        <div class="card-header">Products</div>
+                        <div class="card-header">{{ __('Products') }}</div>
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-sm-4">
-                                <p class="text-center">Name</p></div>
+                                <p class="text-center">{{ __('Name') }}</p></div>
                                 <div class="col-sm-6"><p class="text-center">Price</p>
                                 </div>
                                 
@@ -23,7 +23,7 @@
                             @foreach ($products as $product)
                                 <div class="row">
                                     <div class="col-sm-4">
-                                    <p class="text-center"><a href="/product/{{$product->id}}">{{$product->name}}</a></p></div>
+                                    <p class="text-center"><a href={{ route('product', ['product'=> $product->id, 'lang' => app()->getLocale()]) }}>{{$product->name}}</a></p></div>
                                     <div class="col-sm-6"><p class="text-center">{{number_format($product->price, 2, ',', ' ')}} zł</p>
                                     </div>
                                     

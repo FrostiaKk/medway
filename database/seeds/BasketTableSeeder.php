@@ -12,9 +12,6 @@ class BasketTableSeeder extends Seeder
      */
     public function run()
     {
-        $basket= new Basket;
-        $basket->user_id=1;
-        $basket->product_id=1;
-        $basket->save();
+        
     }
 }

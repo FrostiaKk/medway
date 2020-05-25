@@ -12,10 +12,9 @@ class BasketController extends Controller
     {
         $this->middleware('auth');
     }
-    public function index() {
+    public function index(Request $request) {
         $user = Auth::user();
-        $products=$user->find(1)->baskets;
-
+        $products=$user->baskets;
         return view('/user/manage/basket', ['products' => $products]);
     }
 
@@ -24,8 +23,13 @@ class BasketController extends Controller
             'id' => 'required',
         ]);
         $user = Auth::user();
-        \App\Basket::where('product_id', $request['id'])->first()->delete();
-        $products=$user->find(1)->baskets;
-        return view('/user/manage/basket', ['products' => $products])->with('success', 'Successfully deleted a Product from your basket ');
+        $products=$user->baskets;
+        $check=\App\Basket::where('id', $request['id'])->first();
+        if($check != null){
+            \App\Basket::where('id', $request['id'])->first()->delete();
+        }else{
+            return redirect('/basket');
+        }  
+        return redirect()->route('basket', app()->getLocale())->with('success', __('Successfully deleted a Product from your basket'));
     }
 }

@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use PDF;
 use App\UserOrder;
+use App\Mail\OrderMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class OrderController extends Controller
 {
@@ -25,15 +28,33 @@ class OrderController extends Controller
             'nip' => ['required', 'min:10', 'max:10'],
 
         ]);
+        
         $user=Auth::user();
-        $baskets=$user->find(1)->baskets;
+        $baskets=$user->baskets;
+        $checkIfError=0;
+        $errorItems=' ';
+        if($baskets->last()==null)return redirect('/home')->with('error', __('Sorry, your cart is empty'));
+        foreach ($baskets as $basket) {
+            if($basket->product->amount < $basket->quantity){
+                $errorItems .= $basket->product->name;
+                $errorItems .= ' ';
+                \App\Basket::where('id', $basket->id)->delete();
+                $checkIfError=1;
+            }
+        }
+
+        if ($checkIfError==1) {
+            return redirect('/home')->with('error', __('Sorry, we are out of stock on these products:'). $errorItems);
+        }
+
         $last=\App\UserOrder::all()->last();
         $userorder=new \App\UserOrder;
-        $value=$last->id;
-        $value=$value+1;
+        
         if ($last==null) {
             $userorder->id=1;
         }else{
+            $value=$last->id;
+            $value=$value+1;
             $userorder->id=$value;
         }
         
@@ -41,8 +62,10 @@ class OrderController extends Controller
             $order= new \App\Order;
             $order->product_id=$basket->product_id;
             $order->user_id=$basket->user_id;
+            $order->quantity=$basket->quantity;
             $order->userorder_id=$userorder->id;
             $order->save();
+            \App\Product::where('id', $basket->product_id)->update(array('amount' => $basket->product->amount - $basket->quantity));
             \App\Basket::where('id', $basket->id)->delete();
             
         }
@@ -55,7 +78,8 @@ class OrderController extends Controller
         $userorder->email=$request['email'];
         $userorder->nip=$request['nip'];
         $userorder->save();
-
-        return redirect('/home')->with('success', 'Successfully Ordered');
+        $pdf = PDF::loadView('pdf.pdf', compact('userorder'));
+        Mail::to($request['email'])->send(new OrderMail($pdf, $userorder));
+        return redirect('/home')->with('success', __('Successfully Ordered'));
     }
 }
